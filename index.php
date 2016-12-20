@@ -29,7 +29,7 @@ function migrate_simple_custom_css() {
     }
     else if(!empty($_POST['migration_acceptance_multi']) && check_admin_referer('migrate_custom_css','migrate_custom_css')) {
         echo'<p>Processing...</p>';
-        $results = get_sites();
+        $results = get_sites(array('number' => null));
         if($results){
             foreach($results AS $subsite){
                 migrate_simple_custom_css_multi(get_object_vars($subsite)["blog_id"]);
@@ -47,7 +47,7 @@ function migrate_simple_custom_css() {
         echo '<hr></hr>';
         if ( is_multisite() ) {
             echo '<b>Multisite Blogs List:</b> ';
-            $multsite_ids = get_sites();
+            $multsite_ids = get_sites(array('number' => null));
                 if($multsite_ids){
                     foreach($multsite_ids AS $subsite_id){
                         echo get_object_vars($subsite_id)["blog_id"] . ', ';
