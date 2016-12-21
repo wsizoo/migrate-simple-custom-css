@@ -22,13 +22,16 @@ function add_menu_item() {
 // Display Page
 function migrate_simple_custom_css() {
     echo'<h2>Migrate CSS from Custom Simple CSS</h2>';
+    // Handles the Single Site post request
     if(!empty($_POST['migration_acceptance_single']) && check_admin_referer('migrate_custom_css','migrate_custom_css')) {
         echo'<p>Processing...</p>';
         migrate_css();
         echo '<h2>Migration Complete!</h2>';   
     }
+    // Handles the Multisite post request
     else if(!empty($_POST['migration_acceptance_multi']) && check_admin_referer('migrate_custom_css','migrate_custom_css')) {
         echo'<p>Processing...</p>';
+        // Get list of all sites without limit
         $results = get_sites(array('number' => null));
         if($results){
             foreach($results AS $subsite){
@@ -37,6 +40,7 @@ function migrate_simple_custom_css() {
         }
         echo '<h2>Multisite Migration Complete!</h2>';  
     }
+    // Handles default page
     else {
         echo'<p><form action="" method="post">';
         echo wp_nonce_field('migrate_custom_css','migrate_custom_css');
@@ -47,6 +51,7 @@ function migrate_simple_custom_css() {
         echo '<hr></hr>';
         if ( is_multisite() ) {
             echo '<b>Multisite Blogs List:</b> ';
+            // Get list of all sites without limit
             $multsite_ids = get_sites(array('number' => null));
                 if($multsite_ids){
                     foreach($multsite_ids AS $subsite_id){
@@ -63,9 +68,11 @@ function migrate_simple_custom_css() {
 // Handles Multsite Configuration
 function migrate_simple_custom_css_multi( $blog_id ) {
     if ( is_multisite() ){
+        // Sets blog to designated subsite
         switch_to_blog( $blog_id );
         migrate_css();
         echo 'CSS Migrated For Blog: ' . $blog_id . '<br/>' ;
+        // Returns to root blog
         restore_current_blog();
     }
     else {
@@ -78,19 +85,21 @@ function migrate_css() {
     if(current_user_can('manage_options')) {
         // Check for 4.7 compatibility
         if ( function_exists( 'wp_update_custom_css_post' ) ) {
-            // Migrate any existing theme CSS to the core option added in WordPress 4.7.
+            // Migrate any existing theme CSS to the core option added in WordPress 4.7
             // Grab Simple Custom CSS 
             $raw_css = get_option( 'sccss_settings' );
             // Extract CSS Content
             $css = isset( $raw_css['sccss-content'] ) && ! empty( $raw_css['sccss-content'] ) ? $raw_css['sccss-content'] : __( '/* Enter Your Custom CSS Here */', 'simple-custom-css' );
+            // Remove default header that may exist in the original CSS
             $css = str_replace('/* Enter Your Custom CSS Here */', '', $css);
             if ( $css ) {
-                // Preserve any CSS already added to the core option.
+                // Preserve any CSS already added to the core option
                 $core_css = wp_get_custom_css();
                 // Concatinate existing CSS with Simple Custom CSS Data
                 $return = wp_update_custom_css_post( $core_css . "\n\n" . $css );
                 if ( ! is_wp_error( $return ) ) {
-                    // Remove the old SCCSS, so that the CSS is stored in only one place moving forward.
+                    // Remove the old SCCSS, so that the CSS is stored in only one place moving forward
+                    // Disabled by default for your saftey. Enable at your own risk
                     // delete_option( 'sccss_settings' );
                 }
              }
