@@ -11,21 +11,21 @@
 
 // Add Admin Menu Under Appearance
  if ( is_multisite() ) {
-    add_action('network_admin_menu','add_menu_item');
+    add_action('network_admin_menu','msccss_add_menu_item');
 } else {
-    add_action('admin_menu','add_menu_item');
+    add_action('admin_menu','msccss_add_menu_item');
 }
-function add_menu_item() {
-    add_menu_page('themes.php', 'Migrate Simple Custom CSS', 'Migrate Simple Custom CSS', 'administrator', 'migrate_simple_custom_css', 'dashicons-randomize' );
+function msccss_add_menu_item() {
+    add_menu_page('themes.php', 'Migrate Simple Custom CSS', 'Migrate Simple Custom CSS', 'administrator', 'msccss_migrate_simple_custom_css', 'dashicons-randomize' );
 }
 
 // Display Page
-function migrate_simple_custom_css() {
+function msccss_migrate_simple_custom_css() {
     echo'<h2>Migrate CSS from Custom Simple CSS</h2>';
     // Handles the Single Site post request
     if(!empty($_POST['migration_acceptance_single']) && check_admin_referer('migrate_custom_css','migrate_custom_css')) {
         echo'<p>Processing...</p>';
-        migrate_css();
+        msccss_migrate_css();
         echo '<h2>Migration Complete!</h2>';   
     }
     // Handles the Multisite post request
@@ -35,7 +35,7 @@ function migrate_simple_custom_css() {
         $results = get_sites(array('number' => null));
         if($results){
             foreach($results AS $subsite){
-                migrate_simple_custom_css_multi(get_object_vars($subsite)["blog_id"]);
+                msccss_migrate_simple_custom_css_multi(get_object_vars($subsite)["blog_id"]);
              }
         }
         echo '<h2>Multisite Migration Complete!</h2>';  
@@ -62,15 +62,15 @@ function migrate_simple_custom_css() {
         echo '<hr></hr>';
         echo '<br/><br/>';
     }     
-} // End migrate_simple_custom_css
+} // End msccss_migrate_simple_custom_css
 
 
 // Handles Multsite Configuration
-function migrate_simple_custom_css_multi( $blog_id ) {
+function msccss_migrate_simple_custom_css_multi( $blog_id ) {
     if ( is_multisite() ){
         // Sets blog to designated subsite
         switch_to_blog( $blog_id );
-        migrate_css();
+        msccss_migrate_css();
         echo 'CSS Migrated For Blog: ' . $blog_id . '<br/>' ;
         // Returns to root blog
         restore_current_blog();
@@ -78,9 +78,9 @@ function migrate_simple_custom_css_multi( $blog_id ) {
     else {
         echo 'WARNING! NOT A MULTISITE INSTALL.';
     }
-} // End migrate_simple_custom_css_multi
+} // End msccss_migrate_simple_custom_css_multi
 
-function migrate_css() {
+function msccss_migrate_css() {
     // Check for Admin user permissions
     if(current_user_can('manage_options')) {
         // Check for 4.7 compatibility
@@ -105,6 +105,6 @@ function migrate_css() {
              }
         }
     }
-} // End migrate_css
+} // End msccss_migrate_css
 
 ?>
